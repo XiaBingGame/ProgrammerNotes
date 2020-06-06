@@ -54,10 +54,26 @@
 
     * 增加一个参数表示光源大小
 
-![](Media/Equation_05_14.png)
+![](Media/Equation_05_13.png)
 
     * CryEngine 的做法
 
 * 由于光源太远，计算光照效果会消耗性能，因此使用窗口函数限定计算的范围,下面公式是虚幻引擎的做法
 
+![](Media/Equation_05_14.png)
+
+* 和距离有关的公司可以简化为下面的公式
+
 ![](Media/Equation_05_15.png)
+
+* Just Cause 2 使用的公式如下
+
+![](Media/Equation_05_16.png)
+
+* 聚光灯公式，方向向量也参与了计算
+
+![](Media/Equation_05_17.png)
+
+* 聚光灯的内角和外角， 半影角(penumbra angle)和阴影角(umbra angle)
+
+![](Media/Figure_05_02.png)
