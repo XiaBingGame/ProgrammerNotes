@@ -1,5 +1,5 @@
 # 第5章 着色基础
-## Gooch 着色模型
+## 1 Gooch 着色模型
 * Gooch 着色模型： 法线与光线方向越趋于一致，色调越暖，否则色调越冷
 
 ![](Media/DragonGoothShadingModel.png)
@@ -14,7 +14,7 @@
     x 带加减符号类似 opengl 的 clamp(0.0, 1.0)， 将x的值裁剪至0.0到1.0之间的范围。
     r 向量计算出太阳光方向在表面上反射的向量
 
-## 光源
+## 2 光源
 * 光照公式分为有光照和无光照部分
 
 ![](Media/Equation_05_03.png)
@@ -35,7 +35,7 @@
 
 ![](Media/Equation_05_08.png)
 
-## 点光源
+### 2.1 点光源
 * 一些参数计算如下：
 
 ![](Media/Equation_05_09.png)
@@ -70,6 +70,8 @@
 
 ![](Media/Equation_05_16.png)
 
+### 2.2 聚光灯
+
 * 聚光灯公式，方向向量也参与了计算
 
 ![](Media/Equation_05_17.png)
@@ -77,3 +79,20 @@
 * 聚光灯的内角和外角， 半影角(penumbra angle)和阴影角(umbra angle)
 
 ![](Media/Figure_05_02.png)
+
+* 聚光灯方向函数的两种实现，分别用于 Frostbite 游戏引擎和 three.js 浏览器图形库
+
+![](Media/Equation_05_18.png)
+
+* 下图展示了效果，分别为方向光，点光源，聚光灯
+
+![](Media/Figure_05_03.png)
+
+## 3 着色模型
+* 着色模型的计算频率，和位于管道中的 stage 有关
+    - Vertex shader --- 逐顶点计算
+    - Hull shader --- 逐 surface patch 计算
+    - Domain shader --- 逐 post-tessellation 顶点计算
+    - Geometry shader --- 逐图元计算
+    - Pixel shader --- 逐像素计算
+* 通常着色模型的高亮部分是非线性的，因此最好不要在顶点阶段进行计算
