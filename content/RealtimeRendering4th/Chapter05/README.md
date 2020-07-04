@@ -220,3 +220,48 @@
 ![](Media/Figure_05_07.png)
 
 左上角，从后向前alpha混合产生的错误内容，右上角，使用A-buffer实现的效果，右下角，使用代价更廉价的 multi-layer alpha blending。左下角为 A-buffer 和 multi-layer alpha blending 的图像对比结果。
+
+* multi-layer alpha blending: 利用了英特尔称之为 pixel synchronization 的功能。通过重新改变存储和混合，当内存耗尽时，可以平滑的降低质量。DX11.3 引入了 rasterizer order views，移动设备类似的技术为 tile local storage.
+* multi-layer alpha blending 方法建立在 k-buffer 这个思路之上。前几个可见层尽可能排序和保存起来，底下的几层通过 weighted average(有权平均)尽可能丢弃和合并。weighted sum和weighted average透明技术都时不依赖于顺序的。该方法的缺点时无法考虑透明物体之间的顺序，例如透明红色围巾在透明蓝色围巾上方时可能产生一个紫色的颜色，事实上应该看到红色的围巾带有一点蓝色的色调
+* weighted sum(有权累加)透明的公式如下, 注意公式中的两个累加部分其值可能会超过1，从而产生错误的结果。
+
+![](Media/Equation_05_31.png)
+
+* weighted average(有权平均)公式如下：
+
+![](Media/Equation_05_32.png)
+
+* 添加距离对透明物体的影响，越近的物体影响越大，因此可以看出物体的远近。
+
+![](Media/Figure_05_08.png)
+  
+  上图给物体演示了距离对透明权重的影响。
+- 根据距离添加权重时，在巨大的场景下，彼此靠近的透明物体混合的结果和有权平均的结果类似。此外，当相机位置发生变化时，根据距离设置的权重也会产生变化。
+* 增加颜色传播效果，之前的透明算法都是将透明度看成覆盖率。这里可以使用透明的颜色过滤不透明的物体，在片段着色器中，使用透明颜色乘以不透明的物体内容，而后这些生成的内容存储到第三个缓冲区内，当解析透明缓冲区时，使用该缓冲区代替不透明场景。
+* 关于透明的论文[1931]，调查[1141]，演讲[1182]
+* 预乘 alpha 值的混合操作， 即RGB的值都已经乘以了 alpha 值
+
+![](Media/Equation_05_33.png)
+
+* 伽马修正，着色器的输出颜色会使用(1/2.2)的幂提升，对于输入的纹理和颜色则使用相反的操作。这是由于输入电压和显示的辐射率之间有指数关系。
+* sRGB 的 display transfer function, 其中 x 为线性RGB三元组
+
+![](Media/Equation_05_34.png)
+
+可近似为下面的公司，其中指数为 1.0/2.2
+
+![](Media/Equation_05_35.png)
+
+从非线性值转换线性值
+
+![](Media/Equation_05_36.png)
+
+比较简单的形式如下
+
+![](Media/Equation_05_37.png)
+
+更简单的形式如下，用于浏览器和移动应用
+
+![](Media/Equation_05_38.png)
+
+* 如果不采用伽马修正，则可能产生不正确的结果，例如图像看起来偏暗，因为辐射量偏低，同时还可能造成反锯齿的结果不正确。
