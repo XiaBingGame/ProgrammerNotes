@@ -6,7 +6,7 @@
   - [5 Material Mapping(材质贴图)](#5-material-mapping材质贴图)
   - [6 Alpha Mapping](#6-alpha-mapping)
   - [7 Bump Mapping](#7-bump-mapping)
-  - [Parallax Mapping](#parallax-mapping)
+  - [8 Parallax Mapping](#8-parallax-mapping)
   - [9 纹理光照](#9-纹理光照)
 
 # 第6章 纹理
@@ -187,7 +187,7 @@
 
 * 使用 Horizon mapping 给 Bumping map 添加阴影。该纹理预先存储表面的方向和水平方向的角度，具体见 11.4 节
 
-## Parallax Mapping
+## 8 Parallax Mapping
 
 * bump map 的缺点无法产生相互遮挡的关系。
 * Parallax mapping 的关键思路：通过检测那些被发现可见内容的高度值，推测出一个像素内应该看到的内容。
