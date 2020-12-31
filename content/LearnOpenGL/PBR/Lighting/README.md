@@ -65,4 +65,6 @@ for(int i = 0; i < 4; ++i)
     vec3 radiance     = lightColors[i] * attenuation; 
     [...]  
 ```
-* 这里使用距离的平方衰减辐射。
+
+* 这里使用距离的平方衰减辐射。 
+* 对于每个光源，我们希望计算完整的 Cook-Torrance BRDF 部分
