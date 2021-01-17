@@ -1,10 +1,10 @@
 # 光照
 
-* 实践部分，使用直接的光源或为分析性的光源。可看成为点光源，方向光光源，聚光灯光源。
+* 实践部分，使用直接光源或为解析光源。可看成为点光源，方向光光源，聚光灯光源。
 
 ![](Media/final_reflectance_equation.png)
 
-* 目前该公式仍未知的是如何精确的表示辐照度(irradiance)，即 Li。辐射L，这里测量的是光源的辐射通量或光线能量，其限制于一个给定的球面角w，我们这里假设球面角w无限的小，以表示测量光源单个光线或某个方向向量下的辐射通量。
+* 目前该公式仍未知是如何精确的表示辐照度(irradiance)，即 Li。辐射L，这里测量的是光源的辐射通量或光线能量，其限制于一个给定的球面角w，我们这里假设球面角w无限的小，以表示测量光源单个光线或某个方向向量下的辐射通量。
 * 这里假设有点光源，所有方向辐射通量都一样(23.47, 21.31, 20.79)。其照射表面一点p，对于点p其上的半球，仅有光源到p之间连线的光线有入射辐射能量。
 
 ![](Media/lighting_radiance_direct.png)
@@ -184,7 +184,7 @@ color = pow(color, vec3(1.0/2.2));
 
 ![](Media/lighting_linear_vs_non_linear_and_hdr.png)
 
-## 完整有向光照 PBR 着色器
+## 完整直接光照 PBR 着色器
 
 ```c++
 
@@ -294,5 +294,5 @@ void main()
 
 * [完整源码](https://learnopengl.com/code_viewer_gh.php?code=src/6.pbr/1.2.lighting_textured/lighting_textured.cpp)
 * [用到的纹理集](https://freepbr.com/materials/rusted-iron-pbr-metal-material-alt/)
-* 有向光中，通常金属表面比较暗，所以需要考虑 environment's specular ambient lighting(环境镜面反射光)
+* 直接光源中，通常金属表面比较暗，所以需要考虑 environment's specular ambient lighting(环境镜面反射光)
 * 可以看出 PBR 的渲染效果更真实。
