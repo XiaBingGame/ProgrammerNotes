@@ -267,7 +267,7 @@ void main()
 * [完整源码](https://learnopengl.com/code_viewer_gh.php?code=src/6.pbr/1.1.lighting/lighting.cpp)
 
 ## PBR纹理
-* 使用纹理代替一直变量来设置面参数。这样可以逐片段控制面的材质属性
+* 使用纹理代替一致变量来设置面参数。这样可以逐片段控制面的材质属性
 
 ```c++
 [...]
