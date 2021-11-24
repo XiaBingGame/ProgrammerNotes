@@ -16,6 +16,7 @@ PBR (physically based rendering).
 microfacet: 微平面，在微尺度上，任何平面都可以看成完美的反射镜面。
 
 ![](Media/microfacets.png)
+![](Media/microfacets.png)
 
 反射结果如下
 

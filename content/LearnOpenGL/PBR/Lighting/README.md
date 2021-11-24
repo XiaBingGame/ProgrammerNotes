@@ -68,3 +68,20 @@ for(int i = 0; i < 4; ++i)
 
 * 这里使用距离的平方衰减辐射。 
 * 对于每个光源，我们希望计算完整的 Cook-Torrance BRDF 部分
+
+![](Media/Cook-Torrance_specular_BRDF.png)
+
+* 首先计算镜面反射和漫反射两者的比例，即有多少面反射的光以及多少面折射的光。通过 Fresnel 公式计算：
+```
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(max(1.0 - cosTheta, 0.0), 5.0);
+}
+```
+    - Fresnel-Schlick 近似法设置 F0 参数为在0度入射角下表面反射的量。F0在每个材质上都不同，且其在金属材质上为染色的颜色内容，该值可通过材质数据库查询。对于介电表面，我们简化F0为常量 0.04，对于金属材质，我们使用 albedo 值表示 F0.
+
+```
+vec3 F0 = vec3(0.04); 
+F0      = mix(F0, albedo, metallic);
+vec3 F  = fresnelSchlick(max(dot(H, V), 0.0), F0);
+```
