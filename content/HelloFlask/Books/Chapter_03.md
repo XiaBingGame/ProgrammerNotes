@@ -1,4 +1,10 @@
 # 第三章 模板
+* Flask 默认使用的模板引擎是 Jinja2， 这是一个功能齐全的 Python 模板引擎。
+* 三种定界符: 语句, 表达式, 注释
+* render_template
+* 辅助工具: 上下文, 全局对象, 过滤器, 测试其
+* 局部模板, 子模版
+* 移除模板空白行, 静态文件
 
 ## 3.1 模板基本用法
 * larr 后退符号, copy 版权符号， 具体可见 https://dev.w3.org/html5/html-author/charref
@@ -13,21 +19,56 @@
 注释
 {# ... #}
 ```
-* Jinja2 for 循环特殊变量
+* Jinja2 支持使用 "." 获取变量的属性， 如 user.username
+* 应当适度使用模板,仅把和输出控制有关的逻辑操作放到模板中.
+* Jinja2 允许在模板中使用大部分 Python 对象(字符串, 列表, 字典, 元组, 整型, 浮点型, 布尔值)
+* Jinja2 支持基本的运算符号(+ - / *), 比较符号(==,!=), 逻辑符号(and, or, not, 括号), in, is, None和布尔值(True, False)
+* 控制语句
+```
+{% if user.bio %}
+    <i>{{ user.bio }}</i>
+{% else %}
+    <i>This user has not privided a bio.</i>
+{% endif %}
+
+<ul>
+    {% for move in movies %}
+    <li>{{ move.name }} - {{ move.year }}</li>
+    {% endfor %}
+</ul>
+```
+* Jinja2 for 循环特殊变量(完整的for循环变量列表见 http://jinja.pocoo.org/docs/2.10/templates/#for)
     - loop.index: 当前迭代数， 从 1 开始
     - loop.index0: 当前迭代数， 从 0 开始
     - loop.revindex: 当前反向迭代数， 从 1 开始
     - loop.revindex0: 当前反向迭代数， 从 0 开始
-    - loop.first
-    - loop.last
-    - loop.previtem
-    - loop.nextitem
-    - loop.length
+    - loop.first: 如果是第一个元素, 则为 True
+    - loop.last: 如果是最后一个元素, 则为 True
+    - loop.previtem: 上一个迭代的条目
+    - loop.nextitem: 下一个迭代的条目
+    - loop.length: 序列包含的元素数量
 * render_template() 渲染函数
+```
+from flask import Flask, render_template
+...
+@app.route('/watchlist')
+def watchlist()
+    return render_template('watchlist.html', user=user, movies=movies)
+```
+* Flask 会在程序根目录下的 templates 文件夹里寻找模板文件, render_template 传入的文件路径是相对于 templates 根目录的
 * Flask 还提供了 render_template_string() 来渲染模板字符串
+* 传入 Jinja2 中的变量值可以是字符串, 列表, 字典, 函数, 类, 类实例
+```
+<p>这是列表 my_list 的第一个元素: {{ my_list[0] }}</p>
+<p>这是元组 my_tuple 的第一个元素: {{ my_tuple[0] }}</p>
+<p>这是字典 my_dict 的键为 name 的值: {{ my_dict['name'] }}</p>
+<p>这是函数 my_func 的返回值: {{ my_func() }}</p>
+<p>这是对象 my_object 调用某方法的返回值: {{ my_object.name() }}</p>
+```
 
 ## 3.2 模板辅助工具
-* 模板中定义变量, 使用 set 标签
+### 3.2.1 上下文
+* 可以在模板中定义变量, 使用 set 标签
 ```
 {% set navigation = [('/', 'Home'), ('/about', 'About')] %}
 ```
@@ -40,9 +81,9 @@
 ```
 * 可以在模板中直接使用的内置变量
     - config: 当前的配置对象
-    - request: 当前的请求对象
-    - session: 当前的会话对象
-    - g: 与请求绑定的全局变量
+    - request: 当前的请求对象, 在已激活的请求环境下可用
+    - session: 当前的会话对象, 在已激活的请求环境下可用
+    - g: 与请求绑定的全局变量, 在已激活的请求环境下可用
 * app.context_processor 装饰器, 可以用来注册模板上下文处理函数, 帮我们完成统一传入变量的工作. 模板上下文处理函数需要返回一个包含变量键值对的字典.
 * 处理模板上下文处理函数
 ```
@@ -64,6 +105,7 @@ app.context_processor(inject_foo)
 ```
 app.context_processor(lambda: dict(foo='I am foo.'))
 ```
+### 3.2.2 全局对象
 * Jinja2 内置模板全局函数
     - range([start, ]stop[, step]): 类似于 Python 的 range()
     - lipsum(n = 5, html=True, min=20, max=100): 生成随即文本
@@ -71,6 +113,7 @@ app.context_processor(lambda: dict(foo='I am foo.'))
 * Flask 内置模板全局函数
     - url_for(): 用于生成 URL 的函数
     - get_flashed_message(): 用于获取 flash 消息的函数
+* Flask 除了把 g, session, config, request 对象注册为上下文变量, 也将它们设为全局变量, 可以全局使用.
 * app.template_global 装饰器直接将函数注册为模板全局函数
 ```
 @app.template_global()
@@ -79,6 +122,7 @@ def bar():
 ```
     - app.template_global() 装饰器使用 name 参数可以指定一个自定义名称.
 * app.add_template_global() 方法注册自定义全局函数, 传入函数对象和可选的自定义名称(name), 比如 app.add_template_global(your_global_function).
+### 3.2.3 过滤器
 * 过滤器(filter)是一些可以用来修改和过滤变量值的特殊函数, 过滤器和变量用一个竖线(管道符号)隔开. 需要参数的过滤器可以像函数一样使用括号传递.
 ```
 {{ name|title }}
@@ -134,6 +178,7 @@ def muscial(s)
     return s + Markup(' &#9834;')
 ```
 * 直接使用 app.add_template_filter() 方法注册自定义过滤器， 传入函数对象和可选的自定义名称(name), 如 app.add_template_filter(your_filter_function)
+### 3.2.4 测试器
 * 用 is 连接变量和测试器, 如 number 测试器
 ```
 {% if age is number %}
@@ -167,6 +212,7 @@ def bar(n):
     return False
 ```
 * app.add_template_test() 方法注册自定义测试器.
+### 3.2.5 模板环境对象
 * Flask 创建 Environment 对象, 存储在 app.jinja_env 属性上
 * app.jinja_env 更改 Jinja2 设置. 如自定义所有的定界符
 ```
@@ -225,7 +271,7 @@ app.jinja_env.tests['bar'] = bar
 ...
 {{ qux(amount=5) }}
 ···
-* include 会传递当前上下文， import 则不会, 可以hi用 with context 传递当前上下文
+* include 会传递当前上下文， import 则不会, 可以使用用 with context 传递当前上下文
 ```
 {% from "macros.html" import foo with context %}
 ```
@@ -289,7 +335,7 @@ url_for('static', filename='avatar.jpg')
 * css，js, 从 Bootstrap 下载，而后分类放在 static 目录下
 * Bootstrap 依赖 jQuery, Popper.js, 按照 jQuery->Popper.js->Bootstrap 的顺序引入
 * CDN 下载， 不过个人觉得可能有访问问题。
-* 方便设置的宏
+* 方便设置的宏, 加载静态资源
 ```
 {% macro static_file(type, filename_or_url, local=True) %}
     {% if local -%}
@@ -303,9 +349,11 @@ url_for('static', filename='avatar.jpg')
         <link rel="icon" href="{{ filename_or_url }}">
     {%- endif %}
 {% endmacro %}
+
+static_file('css', 'css/bootstrap.min.css')
 ```
 * 消息闪现 flash() 函数。flash() 发送的消息存储在 session 中, 模板使用全局函数 get_flashed_messages() 获取消息
-* HTML 文件 head 标签添加编码生命 <meta charset="utf-8">
+* HTML 文件 head 标签添加编码声明 <meta charset="utf-8">
 * 模板设置 flash 消息
 ```
 <main>

@@ -3,19 +3,21 @@
     - wsgi
     - flask 的 request 的各项属性, 如 path, args 等属性
     - flask routes 查看定义的所有路由
-    - 其他类型： /goback/<int:year>
+    - 其他类型： /goback/<int:year>, 内置变量转换器
     - 可选值： @app.route('/colors/<any(blue, white, red):color>')
     - app 的五个钩子函数
     - Flask 会调用 make_response() 方法将视图函数返回值转换为响应对象
     - 视图函数可以返回最多由三个元素组成的元组: 响应主体, 状态码, 首部字段 
     - redirect() 函数可以生成重定向响应
     - Flask 的 abort() 函数可以手动返回错误响应, abort() 函数之后的代码将不会被执行
-    - repsponse 对象的 mimetype 属性可以设置 MIME 类型
+    - repsponse 对象的 mimetype 属性可以设置 MIME 类型, MIME 也就是 Head 内的 Content-Type
     - json.dumps() 方法将字典, 列表或者元组序列化为 json 字符串
     - Flask 更便捷的包装函数 jsonify(), 默认生成 200 响应
     - response.set_cookie() 方法支持多个参数来设置 Cookie 的选项,
     - Cookie 可以通过request对象的 cookies 属性读取
     - Flask 提供了 session 对象用来将 Cookie 数据加密存储, 将数据存储在浏览器上一个名为 session 的 cookie 里 
+	- 保存密钥的安全做法是将密钥写入系统环境变量, 而后保存在 .env 文件中
+	- 通过 session 模拟登录登出系统
     - Flask 的四个上下文变量: current_app, g, request, session
     - teardown_appcontext 钩子, 在程序上下文被销毁时调用, 也会在请求上下文被销毁时调用.
     - URL 的 referer 和 next 容易被篡改, 需要进行验证
@@ -27,7 +29,7 @@
 * WSGI 将 HTTP 格式的请求数据转换成 Flask 程序能够使用的 Python 数据
 * URL 的查询字符串从问号?开始, 以键值对的形式写出, 多个键值对之间使用&分隔
 * 访问页面, 请求方法一般是GET,填写表单并提交,请求方法通常为POST
-* http://helloflask.com/hello?name=Grey 通过  request 的属性获取报文中的数据
+* http://helloflask.com/hello?name=Grey 通过  request 的属性获取报文中的数据, 有属性 path, full_path, host, host_url, base_url, url, url_root
 ```
 path: u'/hello'
 full_path: u'/hello?name=Grey'
@@ -158,7 +160,7 @@ from flask import Flask, abort
 def not_found():
     abort(404)
 ```
-* 不同的响应数据格式需要设置不同的 MIME 类型, MIME 类型在 HEAD 的 Content-Type 字段中定义, 如 HTML 类型
+* MIME类型: 不同的响应数据格式需要设置不同的 MIME 类型, MIME 类型在 HEAD 的 Content-Type 字段中定义, 如 HTML 类型
 ```
 Content-Type: text/html; charset=utf-8
 ```
@@ -193,12 +195,6 @@ from flask import jsonify
 @app.route('/foo')
 def foo():
     return jsonify(name='Grey Li', gender='male')
-```
-```
-from flask import jsonify
-@app.route('/foo')
-def foo():
-    return jsonify({name: 'Grey Li', gender: 'male'})
 ```
 * Response 类的常用属性和方法
 ```
