@@ -13,10 +13,13 @@
 
 ### Python 学习
 * [Hello Flask](content/HelloFlask/README.md)
+* [Python3网络爬虫开发实战](content/WebCrawler/README.md)
+* [Python网络编程](content/Python网络编程/README.md)
 
 ### 程序开发
 
 * [《代码整洁之道》读书笔记](content/《代码整洁之道》读书笔记/README.md)
+* [《这样编码才规范---128个编码好习惯》读书笔记](content/《这样编码才规范》读书笔记/README.md)
 
 ### 软件使用
 
