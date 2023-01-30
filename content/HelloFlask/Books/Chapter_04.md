@@ -333,3 +333,108 @@ class UploadForm(FlaskForm):
     - FileAllowed
 * 扩展Flask-Uploads（https://github.com/maxcountryman/flask-uploads）内置了在Flask中实现文件上传的便利功能。
 * Flask-WTF提供的 FileAllowed() 也支持传入Flask-Uploads中的上传集对象（Upload Set）作为 upload_set参数的值。另外，同类的扩展还有 Flask-Transfer(https://github.com/justanr/Flask-Transfer)。
+* 对文件大小进行验证. 过设置Flask内置的配置变量 MAX_CONTENT_LENGTH，我们可以限制请求报文的最大长度，单位为字节（byte）。比如，下面将最大长度限制为3M
+```
+app.config['MAX_CONTENT_LENGTH'] = 3 * 1024 * 1024
+```
+* 在新创建的upload视图里，我们实例化表单类UploadForm，然后传入模板：
+```
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    form = UploadForm()
+    ...
+    return render_template('upload.html', form=form)
+
+
+# form/templates/upload.html
+<form method="post" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {{ form_field(form.photo) }}
+    {{ form.submit }}
+</form>
+```
+* 和普通的表单数据不同，当包含上传文件字段的表单提交后，上传的文件需要在请求对象的files属性（request.files）中获取。这个属性是Werkzeug提供的ImmutableMultiDict字典对象，存储字段的name键值和文件对象的映射，比如：
+```
+ImmutableMultiDict([('photo', <FileStorage: u'0f913b0ff95.JPG' ('image/jpeg')>)])
+```
+* 上传的文件会被Flask解析为Werkzeug中的FileStorage对象（werkzeug.datastructures.FileStorage）。当手动处理时，我们需要使用文件上传字段的name属性值作为键获取对应的文件对象。比如：
+```
+request.files.get('photo')
+```
+* form/app.py：处理上传文件
+```
+import os
+app.config['UPLOAD_PATH'] = os.path.join(app.root_path, 'uploads')
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    form = UploadForm()
+    if form.validate_on_submit():
+        f = form.photo.data
+        filename = random_filename(f.filename)
+        f.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+        flash('Upload success.')
+        session['filenames'] = [filename]
+        return redirect(url_for('show_images'))
+    return render_template('upload.html', form=form)
+```
+* 当表单通过验证后，我们通过form.photo.data获取存储上传文件的 FileStorage 对象。接下来，我们需要处理文件名，通常有三种处理方式：
+    - 使用原文件名, 如果能够确定文件的来源安全，可以直接使用原文件名，通过FileStorage对象的filename属性获取：
+```
+filename = f.filename
+```
+    - 使用过滤后的文件名, 如果要支持用户上传文件，我们必须对文件名进行处理，因为攻击者可能会在文件名中加入恶意路径。比如，如果恶意用户在文件名中加入表示上级目录的..（比如../../../../home/username/.bashrc或../../../etc/passwd），那么当我们保存文件时，如果这里表示上级目录的..数量正确，就会导致服务器上的系统文件被覆盖或篡改，还有可能执行恶意脚本。我们可以使用Werkzeug提供的secure_filename（）函数对文件名进行过滤，传递文件名作为参数，它会过滤掉所有危险字符，返回“安全的文件名”，如下所示：
+```
+>>> from werkzeug import secure_filename
+>>> secure_filename('avatar!@#//#\\%$^&.jpg')
+'avatar.jpg'
+>>> secure_filename('avatar头像.jpg')
+'avatar.jpg'
+```
+    - 统一重命名, secure_filename（）函数非常方便，它会过滤掉文件名中的非ASCII字符。但如果文件名完全由非ASCII字符组成，那么会得到一个空文件名：
+```
+>>> secure_filename('头像.jpg')
+'jpg'
+```
+* 为了避免出现这种情况，更好的做法是使用统一的处理方式对所有上传的文件重新命名。随机文件名有很多种方式可以生成，下面是一个使用Python内置的uuid模块生成随机文件名的random_filename（）函数：
+```
+def random_filename(filename):
+    ext = os.path.splitext(filename)[1]
+    new_filename = uuid.uuid4().hex + ext
+    return new_filename
+```
+    - 这个函数接收原文件名作为参数，使用内置的uuid模块中的uuid4（）方法生成新的文件名，并使用hex属性获取十六进制字符串，最后返回包含后缀的新文件名。
+* 处理完文件名后，是时候将文件保存到文件系统中了。我们在form目录下创建了一个uploads文件夹，用于保存上传后的文件。指向这个文件夹的绝对路径存储在自定义配置变量UPLOAD_PATH中：
+```
+app.config['UPLOAD_PATH'] = os.path.join(app.root_path, 'uploads')
+```
+* 这里的路径通过app.root_path属性构造，它存储了程序实例所在脚本的绝对路径，相当于os.path.abspath（os.path.dirname（__file__））。为了保存文件，你需要提前手动创建这个文件夹。
+* 对FileStorage对象调用save（）方法即可保存，传入包含目标文件夹绝对路径和文件名在内的完整保存路径：
+```
+f.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+```
+* 文件保存后，我们希望能够显示上传后的图片。为了让上传后的文件能够通过URL获取，我们还需要创建一个视图函数来返回上传后的文件，如下所示：
+```
+@app.route('/uploads/<path:filename>')
+def get_file(filename):
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+```
+    - 这个视图的作用与Flask内置的static视图类似，通过传入的文件路径返回对应的静态文件。在这个uploads视图中，我们使用Flask提供的send_from_directory（）函数来获取文件，传入文件的路径和文件名作为参数。
+* 在get_file视图的URL规则中，filename变量使用了path转换器以支持传入包含斜线的路径字符串。在upload视图里保存文件后，我们使用flash（）发送一个提示，将文件名保存到session中，最后重定向到show_images视图。show_images视图返回的uploaded.html模板中将从session获取文件名，渲染出上传后的图片。
+```
+flash('Upload success.')
+session['filenames'] = [filename]
+return redirect(url_for('show_images'))
+```
+* 这里将filename作为列表传入session只是为了兼容下面的多文件上传示例，这两个视图使用同一个模板，使用session可以在模板中统一从session获取文件名列表。
+* 在uploaded.html模板里，我们将传入的文件名作为URL变量，通过上面的get_file视图获取文件URL，作为<img>标签的src属性值，如下所示：
+```
+<img src="{{ url_for('get_file', filename=filename) }}">
+```
+    - 访问http://localhost:5000/upload 打开文件上传示例，选择文件并提交后即可看到上传后的图片。另外，你会在示例程序文件夹中的uploads目录下发现上传的文件。
+* 多文件上传
+
+
+### 4.4.5 使用Flask-CKEditor集成富文本编辑器
+
+
+### 4.4.6 单个表单多个提交按钮
