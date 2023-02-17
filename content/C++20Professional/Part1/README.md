@@ -1,6 +1,6 @@
 # 第1章 C++和标准库速成
 * 最简单的代码
-{{{c++
+```
 import <iostream>;
 
 int main(int argc, char** argv)
@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 	std::cout << "Hello, World!" << std::endl;
 	return 0;
 }
-}}}
+```
 * C 中的标准库头文件在C++中依然存在, 但使用以下两个版本
     - 不使用 .h 后缀, 改用前缀 c, 这是推荐使用的版本, 其所有内容放在 std 名称空间内(如 <cstdio>>)
     - 使用 .h 后缀, 这是旧版本, 不使用名称空间(如 <stdio.h>)
