@@ -7,3 +7,15 @@
 
 ## 第3章 享元模式
 * [第3章 享元模式](Chapter03/README.md)
+
+## 第4章 观察者模式
+* [第4章 观察者模式](Chapter04/README.md)
+
+## 第5章 原型模式
+* [第5章 原型模式](Chapter05/README.md)
+
+## 第6章 单例模式
+* [第6章 单例模式](Chapter06/README.md)
+
+## 第7章 状态模式
+* [第7章 状态模式](Chapter07/README.md)
