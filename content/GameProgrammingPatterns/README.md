@@ -19,3 +19,10 @@
 
 ## 第7章 状态模式
 * [第7章 状态模式](Chapter07/README.md)
+
+## 第8章 双缓冲
+* [第8章 双缓冲](Chapter08/README.md)
+
+## 第9章 更新方法
+* [第9章 更新方法](Chapter09/README.md)
+
