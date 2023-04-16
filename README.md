@@ -11,6 +11,7 @@
 * [Learn OpenGL](content/LearnOpenGL/README.md)
 * [Realtime-Rendering 第四版](content/RealtimeRendering4th/README.md)
 * [游戏编程模式](content/GameProgrammingPatterns/README.md)
+* [游戏引擎架构](content/GameEngineArchitecture/README.md)
 
 ### Python 学习
 * [Hello Flask](content/HelloFlask/README.md)
