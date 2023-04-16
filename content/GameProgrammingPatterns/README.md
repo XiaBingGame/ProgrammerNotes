@@ -23,6 +23,12 @@
 ## 第8章 双缓冲
 * [第8章 双缓冲](Chapter08/README.md)
 
-## 第9章 更新方法
-* [第9章 更新方法](Chapter09/README.md)
+## 第9章 游戏循环
+* [第9章 游戏循环](Chapter09/README.md)
+
+## 第10章 更新方法
+* [第10章 更新方法](Chapter10/README.md)
+
+## 第11章 字节码
+* [第11章 字节码](Chapter11/README.md)
 
