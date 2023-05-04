@@ -32,3 +32,5 @@
 ## 第11章 字节码
 * [第11章 字节码](Chapter11/README.md)
 
+## 第12章 子类沙盒
+* [第12章 子类沙盒](Chapter12/README.md)
