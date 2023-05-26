@@ -74,3 +74,5 @@ render(lag / MS_PER_UPDATE);
         - 掌控一切
         - 需要实现平台的接口，划分出一些时间处理应用程序框架和操作系统的事件。
 * 对于移动设备，可能需要减少CPU的使用，如设置帧率上限(30FPS或60FPS)以减少能耗。
+* 经典文章 Glenn Fiedler 的 Fix Your Timestep
+* Witters 的 game loops
