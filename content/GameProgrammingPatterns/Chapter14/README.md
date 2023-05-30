@@ -174,3 +174,111 @@ private:
 
 Bjorn* bjorn = new Bjorn(new PlayerInputComponent());
 ```
+* 例如添加一个演示模式，当玩家停留在主菜单并且不做任何事情时，电脑代替玩家让游戏自动演示。
+```
+class DemoInputComponent : public InputComponent {
+public:
+    virtual void update(Bjorn& bjorn) {
+        // AI 自动控制 Bjorn...
+    }
+
+};
+
+Bjorn* bjorn = new Bjorn(new DemoInputComponent());
+```
+* 创建剩余的组件抽象类
+```
+class PhysicsComponent {
+public:
+    virtual ~PhysicsComponent() {}
+    virtual void update(GameObject& object, World& world) = 0;
+}
+
+class GraphicsComponent {
+public:
+    virtual ~GraphicsComponent() {}
+    virtual void update(GameObject& object, World& world) = 0;
+}
+```
+* 重构 Bjorn 类
+```
+class GameObject {
+public:
+    int velocity;
+    int x, y;
+
+    GameObject(InputComponent* input,
+        PhysicsComponent* physics,
+        GraphicsComponent* graphics)
+    : input_(input)
+    , physics_(physics)
+    , graphics_(graphics)
+    {}
+
+    void update(World& world, Graphics& graphics) {
+        input_->update(*this);
+        physics_->update(*this, world);
+        graphics_->update(*this, graphics);
+    }
+
+private:
+    InputComponent* input_;
+    PhysicsComponent* physics_;
+    GraphicsComponent* graphics_;
+};
+
+class BjornPhysicsComponent : public PhysicsComponent {
+public:
+    virtual void update(GameObject& obj, World& world) {
+        // 物理代码
+    }
+};
+
+class BjornGraphicsComponent : public GraphicsComponent {
+public:
+    virtual void update(GameObject& obj, Graphics& graphics) {
+        // 图形代码
+    }
+};
+
+GameObject* createBjorn() {
+    return new GameObject(
+        new PlayerInputComponent(),
+        new BjornPhysicsComponent(),
+        new BjornGraphicsComponent()
+    );
+}
+```
+* 设计决策
+    - 对象如何获得组件
+        - 由类自己创建其所包含的组件，此方法不灵活
+        - 外部代码传进所有需要的组件，实际的组件可能是其派生类，对象只知道这些组建的接口.
+    - 组件之间如何传递信息
+        - 修改组件容器对象的状态
+        - 直接互相引用
+        - 通过传递信息的方式
+```
+class Component {
+public:
+    virtual ~Component() {}
+    virtual void receive(int message) = 0;
+};
+
+class ContainerObject {
+public:
+    void send(int message) {
+        for(int i = 0; i < MAX_COMPONENTS; i++) {
+            if(components_[i] != NULL) {
+                components_[i]->receive(message);
+            }
+        }
+    }
+
+private:
+    static const int MAX_COMPONENTS = 10;
+    Component* components_[MAX_COMPONENTS];
+}
+```
+* Unity 框架的核心 GameObject 类完全围绕组件来设计
+* 开源引擎 Delta3D 有一个 GameActor 基类， 该基类使用一个名叫 ActorComponent 的基类实现了组件模式
+* 组件模式和GoF的策略模式很想，只是策略模式的“策略”是无状态的，它封装了一个算法，但是没有数据。
