@@ -1,0 +1,1 @@
+* 类型: wchar_t 宽字符(16位), char32_t/char16_t UNICODE 字符

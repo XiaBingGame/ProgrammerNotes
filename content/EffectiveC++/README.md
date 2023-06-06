@@ -1,4 +1,5 @@
-# 条款02: 尽量以 const, enum, inline 替换 #define # 
+# 条款02: 尽量以 const, enum, inline 替换 #define
+* 宏不会产生名称
 * enum 和 #define 一样不会导致非必要的内存分配
 * 对于宏函数, 用 inline template 函数代替
 

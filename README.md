@@ -25,6 +25,7 @@
 ### C++ 学习
 * [C++20 高级编程](content/C++20Professional/README.md)
 * [Effective C++](content/EffectiveC++/README.md)
+* [C++ Primer](content/C++Primer/README.md)
 
 
 ### 语言学习
