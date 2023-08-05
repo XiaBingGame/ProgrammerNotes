@@ -56,5 +56,11 @@
 ## 第17章 数据局部性
 * [第17章 数据局部性](Chapter17/README.md)
 
+## 第18章 脏标记模式
+* [第18章 脏标记模式](Chapter18/README.md)
 
+## 第19章 对象池
+* [第19章 对象池](Chapter19/README.md)
 
+## 第20章 空间分区
+* [第20章 空间分区](Chapter20/README.md)
