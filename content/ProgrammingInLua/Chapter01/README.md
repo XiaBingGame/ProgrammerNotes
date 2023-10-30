@@ -14,7 +14,7 @@ x = x or v
 等价于
 if not x then x = v end
 
-a and b or b
+a and b or c
 等价于 C语言的 a ? b : c
 ```
 * lua [options] [script [args]]

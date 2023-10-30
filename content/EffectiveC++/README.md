@@ -1,17 +1,10 @@
-# 条款02: 尽量以 const, enum, inline 替换 #define
-* 宏不会产生名称
-* enum 和 #define 一样不会导致非必要的内存分配
-* 对于宏函数, 用 inline template 函数代替
+# 条款02 尽量以 const, enum, inline 替换 #define
+* [条款02](ch02/README.md)
+
 
 # 条款03: 尽可能使用 const
-* const 方法做用于 const 对象
-* 方法可以有常量和非常量版本, 非常量版本调用常量版本的同名成员函数
-{{{c++
-char& operator[](std::size_t position)
-{
-	return const_cast<char&>(static_cast<const TextBlock&>(*this)[position]);
-}
-}}}
+* [条款03](ch03/README.md)
+
 
 # 条款04: 确定对象被使用前已先被初始化
 * 确保每一个构造函数都将对象的每一个成员初始化 
