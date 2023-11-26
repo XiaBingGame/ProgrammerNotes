@@ -1,7 +1,8 @@
 # 第四章 表单
+* 使用到的Python库有: WTForms, Flask-WTF, Flask-CKEditor
 
 # 4.1 HTML 表单
-* 最简单的表单
+* 最简单的表单, <form> 标签创建, <input> 标签定义
 ```
 <form method="post">
     <label for="username">Username</label><br>
@@ -23,6 +24,14 @@
 app.secret_key = 'secret_string'
 ```
 * WTForms 导入 Form 基类
+	- 通过类创建表单
+```
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(8, 128)])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Log in')
+```
 * 常用的 WTForms 字段
     - BooleanField: 复选框, 处理为 True 或 False
     - DateField: 文本字段, 处理为 datetime.date 对象
@@ -104,7 +113,6 @@ def basic():
 </form>
 ```
 * Flask-WTF 为表单类实例提供了一个 form.hidden_tag() 方法, 其会依次渲染表单中所有的隐藏字段, 如 csrf_token 字段
-* 通过 render_kw 实现 Bootstrap 风格的表单
 
 ## 4.3 处理表单数据
 * 从获取数据到保存数据大致经历以下步骤:

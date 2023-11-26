@@ -2,7 +2,7 @@
 * Flask 默认使用的模板引擎是 Jinja2， 这是一个功能齐全的 Python 模板引擎。
 * 三种定界符: 语句, 表达式, 注释
 * render_template
-* 辅助工具: 上下文, 全局对象, 过滤器, 测试其
+* 辅助工具: 上下文, 全局对象, 过滤器, 测试器
 * 局部模板, 子模版
 * 移除模板空白行, 静态文件
 
@@ -105,6 +105,7 @@ app.context_processor(inject_foo)
 ```
 app.context_processor(lambda: dict(foo='I am foo.'))
 ```
+
 ### 3.2.2 全局对象
 * Jinja2 内置模板全局函数
     - range([start, ]stop[, step]): 类似于 Python 的 range()
@@ -122,6 +123,7 @@ def bar():
 ```
     - app.template_global() 装饰器使用 name 参数可以指定一个自定义名称.
 * app.add_template_global() 方法注册自定义全局函数, 传入函数对象和可选的自定义名称(name), 比如 app.add_template_global(your_global_function).
+
 ### 3.2.3 过滤器
 * 过滤器(filter)是一些可以用来修改和过滤变量值的特殊函数, 过滤器和变量用一个竖线(管道符号)隔开. 需要参数的过滤器可以像函数一样使用括号传递.
 ```
@@ -178,6 +180,7 @@ def muscial(s)
     return s + Markup(' &#9834;')
 ```
 * 直接使用 app.add_template_filter() 方法注册自定义过滤器， 传入函数对象和可选的自定义名称(name), 如 app.add_template_filter(your_filter_function)
+
 ### 3.2.4 测试器
 * 用 is 连接变量和测试器, 如 number 测试器
 ```
@@ -212,6 +215,7 @@ def bar(n):
     return False
 ```
 * app.add_template_test() 方法注册自定义测试器.
+
 ### 3.2.5 模板环境对象
 * Flask 创建 Environment 对象, 存储在 app.jinja_env 属性上
 * app.jinja_env 更改 Jinja2 设置. 如自定义所有的定界符
@@ -270,7 +274,7 @@ app.jinja_env.tests['bar'] = bar
 {% from 'macros.html' import qux %}
 ...
 {{ qux(amount=5) }}
-···
+```
 * include 会传递当前上下文， import 则不会, 可以使用用 with context 传递当前上下文
 ```
 {% from "macros.html" import foo with context %}

@@ -25,12 +25,22 @@
     - 使用 jQuery 发送 AJAX 请求. jQuery 是流行的 JavaScript 库. jQuery 处理了不同浏览器的 AJAX 兼容问题
     - HTTP 服务器端推送
 
+## 2.1 请求响应循环
+* 服务器指的是处理请求和响应的 Web 服务器.
 * 服务器端: Web服务器和 WSGI 交互, WSGI 和 Flask 程序交互, Flask 程序和数据库交互
 * WSGI 将 HTTP 格式的请求数据转换成 Flask 程序能够使用的 Python 数据
+
+## 2.2 HTTP 请求
 * URL 的查询字符串从问号?开始, 以键值对的形式写出, 多个键值对之间使用&分隔
+### 2.2.1 请求报文
+* 浏览器发送的数据称之为请求报文, 服务器发送的数据称之为响应报文
+* 报文由报文首部和报文主体组成, 两者由空行分隔, 请求报文的主体一般为空. 如果提交了表单, 那么报文主体将会是表单数据.
 * 访问页面, 请求方法一般是GET,填写表单并提交,请求方法通常为POST
-* http://helloflask.com/hello?name=Grey 通过  request 的属性获取报文中的数据, 有属性 path, full_path, host, host_url, base_url, url, url_root
+* 常见的方法有: GET, POST, PUT, DELETE, HEAD, OPTIONS
+### 2.2.2 Request 对象
+* 通过  request 的属性获取报文中的数据, 有属性 path, full_path, host, host_url, base_url, url, url_root
 ```
+http://helloflask.com/hello?name=Grey
 path: u'/hello'
 full_path: u'/hello?name=Grey'
 host: u'helloflask.com'
@@ -39,7 +49,7 @@ base_url: u'http://helloflask.com/hello'
 url: u'http://helloflask.com/hello?name=Grey'
 url_root: u'http://helloflask.com/
 ```
-* request 的其他属性: args, blueprint, cookies, data, endpoint, files, form, values, get_data(), get_json(), headers, is_json, json, method
+* request 的其他属性: args, blueprint, cookies, data, endpoint, files, form, values, get_data(), get_json(), headers, is_json, json, method, referrer, scheme, user-agent
 * 获取 URL 中的查询字符串
 ```
 from flask import Flask, request
@@ -50,6 +60,7 @@ def hello():
     return '<h1>Hello, %s!<h1>' % name       
 ```
   - 上面如果使用键作为索引获取数据, 如 name = request.args['name'], 如果没有对应键, 则会返回 HTTP 400 错误响应
+### 2.2.3 在 Flask 中处理请求
 * 路由表(app.url_map): 将请求分发到对应的视图函数, 如果没有找到视图函数, 则会得到404响应
 * flask routes 命令可以查看程序中定义的所有路由
 * static 端点是 Flask 的特殊路由, 用来访问静态文件
@@ -62,7 +73,7 @@ def hello():
 ```
 * 如果视图函数无法处理其他方法, 比如 POST 方法, 则会返回 405 错误响应(Method Not Allowed)
 * 同一个 URL 规则可以定义多个视图函数, 分别处理不同 HTTP 方法的请求
-* URL 变量可以解析为其他类型, 默认为字符串, 如 /goback/<int:year>
+* URL 变量可以解析为其他类型, 默认为字符串, 如 /goback/<int:year>, 浏览器对应输入为 /goback/34
 * Flask 内置 URL 变量转换器
 ```
 string --- 不包含斜线的字符串
@@ -79,22 +90,25 @@ def go_back(year):
     return '<p>Welcome to %d!</p>' % (2018 - year)
 ```
   - 如果传入的不是整数, 则直接返回 404 错误响应
+  - 使用转换器可以避免自己去验证
 * any 转换器, 添加括号给出可选值, "<any (value1, value2, ...): 变量名>", 或者先给出一个预先定义的列表, 而后通过格式化字符串的方式构建URL规则字符串
 ```
 @app.route('/colors/<any(blue, white, red):color>')
 def three_colors(color):
     return '<p>Love is patient and kind. Love is not jealous or boastful or p
 
+# 演示如何从一个预先定义的列表传入, 1:-1 表示生成的字符串去掉第一个和最后一个字符, 这里面分别为'[' 和 ']'
 colors = ['blue', 'white', 'red']
 @app.route('/colors/<any(%s):color>' % str(colors)[1:-1])
 ```
+### 2.2.4 请求钩子
 * 钩子函数用于表示请求处理不同阶段执行的处理函数, 通过装饰器实现. 例如对函数附加了 app.before_request 装饰器后, 该函数就会注册微 before_request 处理函数. 五种请求钩子
 ```
-before_first_request
-before_request
-after_request
+before_first_request: 处理第一个请求前运行
+before_request: 处理每个请求前运行
+after_request: 如无异常, 则每个请求后运行
 teardown_request: 即使有未处理的异常抛出, 会在每个请求结束后运行. 如果发生异常, 传入异常对象作为参数到注册的函数中.
-after_this_request
+after_this_request: 请求结束后运行
 ```
 * 每个钩子可以注册任意多个处理函数, 函数名并不是必须和钩子名称相同, 例子:
 ```
@@ -106,9 +120,24 @@ def do_something():
 	- before_first_request: 创建数据库表, 添加管理员用户等
 	- before_request:记录用户最后在线的时间
 	- after_request:提交数据库的更改
-* after_reqeust 和 after_this_request 必须接收一个响应类对象作为参数
+* after_reqeust 和 after_this_request 必须接收一个响应类对象作为参数, 并且返回同一个或更新后的响应对象.
+
+## 2.3 HTTTP响应
+### 2.3.1 响应报文
+* 响应报文主要由协议版本、状态码(status code)、原因短语(reason phrase)、响应首部和响应主体组成。
+* 视图函数中返回的内容即为响应报文中的主体内容.
+* 常见的状态码
+```
+成功: 200(OK), 201(Created), 204(No Content)
+重定向: 301(Moved Permanently, 永久重定向), 302(Found, 临时性重定向), 304(Not Modified)
+客户端错误: 400(Bad Request), 401(Unauthoried), 403(Forbidden), 404(Not Found)
+服务器端错误: 500(Internal Server Error)
+```
 * 环境为 production 时, 程序出错, Flask 自动返回 500 错误响应, 调试模式则会显示调试信息和错误堆栈
-* Flask 使用 Response 对象表示响应, Flask 会调用 make_response() 方法将视图函数返回值转换为响应对象
+### 2.3.2 在 Flask 中生成响应
+* Flask 使用 Response 对象表示响应, 响应报文中的大部分内容由服务器处理, 大多数情况下, 我们只负责返回主体内容.
+* 视图函数的返回值构成了响应报文的主体内容, 返回时状态码默认为 200.
+* Flask 会调用 make_response() 方法将视图函数的返回值转换为响应对象
 * 视图函数可以返回最多由三个元素组成的元组: 响应主体, 状态码, 首部字段
 	- 可以只包含主体内容
 ```
@@ -131,6 +160,7 @@ def hello():
     ...
     return '', 302, {'Location', 'http://www.example.com'}
 ```
+#### 2.3.2.1 重定向
 * redirect() 函数可以生成重定向响应
 ```
 from flask import Flask, redirect
@@ -152,7 +182,9 @@ def hi():
 def hello():
     ...
 ```
-* HTTP错误对应的异常类在 Werkzeug 的 werkzeug.exceptions 模块中定义, 抛出这些异常即可返回对应的错误响应. Flask 的 abort() 函数可以手动返回错误响应, abort() 函数之后的代码将不会被执行
+#### 2.3.2.2 错误响应
+* HTTP错误对应的异常类在 Werkzeug 的 werkzeug.exceptions 模块中定义, 抛出这些异常即可返回对应的错误响应. 
+* 如果你想手动返回错误响应, Flask 的 abort() 函数可以实现, abort() 函数之后的代码将不会被执行
 ```
 from flask import Flask, abort
 ...
@@ -160,6 +192,7 @@ from flask import Flask, abort
 def not_found():
     abort(404)
 ```
+### 2.3.3 响应格式
 * MIME类型: 不同的响应数据格式需要设置不同的 MIME 类型, MIME 类型在 HEAD 的 Content-Type 字段中定义, 如 HTML 类型
 ```
 Content-Type: text/html; charset=utf-8
@@ -196,6 +229,8 @@ from flask import jsonify
 def foo():
     return jsonify(name='Grey Li', gender='male')
 ```
+### 2.3.4 来一块 Cookie
+* Cookie 技术通过在请求和响应报文中添加 Cookie 数据来保存客户端的状态信息.
 * Response 类的常用属性和方法
 ```
 headers
@@ -238,6 +273,7 @@ def hello():
         name = request.cookies.get('name', 'Human')  # 从Cookie中获取name值
     return '<h1>Hello, %s</h1>' % name
 ```
+### 2.3.5 安全的 Cookie
 * Flask 提供了 session 对象用来将 Cookie 数据加密存储, 将数据存储在浏览器上一个名为 session 的 cookie 里
 	* session 需要设置密钥. 通过 Flask.secret_key 属性或者 SECRET_KEY 设置
 ```
@@ -300,6 +336,8 @@ def logout():
 ```
 * 默认情况, session cookie 在用户关闭浏览器时删除. 设置 session.permanent 为 True, 可以将 session 的有效期延长为 Flask.permanent_session_lifetime 的属性值对应的 datetime.timedelta 对象, 或者设置 PERMANENT_SESSION_LIFETIME 变量, 默认为 31 天
 * 不要在 session 中存储敏感信息
+
+## 2.4 Flask 上下文
 * Flask 的四个上下文变量, 这四个变量都是代理对象(proxy). 如果要获取原始对象, 可以对代理对象调用 _get_current_object() 方法
 	* current_app: 程序上下文, 指向处理请求的当前程序实例
 	* g: 程序上下文, 替代Python的全局变量用法, 仅在当前请求中可用, 用于存储全局数据, 每次请求都会重设.
@@ -353,6 +391,9 @@ def teardown_db(exception):
     ...
     db.close()
 ```
+
+## 2.5 HTTP 进阶实践
+### 2.5.1 重定向回上一个页面
 * 重定向至上个页面
 ```
 return redirect(request.referrer)
@@ -362,6 +403,7 @@ return redirect(request.referrer)
 return redirect(request.referrer or url_for('hello'))
 ```
 * 返回值后添加 next 参数
+	- request.full_path 获取完整的路径
 ```
 # redirect to last page
 @app.route('/foo')
@@ -380,7 +422,7 @@ def bar():
 return redirect(request.args.get('next'))
 return redirect(request.args.get('next', url_for('hello')))
 ```
-* 结合两者
+* 结合两者, 先查找 next, 没有再查找 referrer
 ```
 def redirect_back(default='hello', **kwargs):
     for target in request.args.get('next'), request.referrer:
@@ -418,6 +460,7 @@ def redirect_back(default='hello', **kwargs):
             return redirect(target)
     return redirect(url_for(default, **kwargs))
 ```
+### 2.5.2 使用 AJAX 技术发送异步请求
 * AJAX 指异步 Javascript 和 XML  (Asynchronous JavaScript And XML), AJAX 基于 XMLHttpRequest, 让我们可以在不重载页面的情况下和服务器进行数据交换. 加上 JavaScript 和 DOM, 就可以在接收到响应数据后局部更新页面. XML 指的是数据交互格式, 其也可以是纯文本, HTML 或 JSON. XMLHttpRequest 不仅支持 HTTP 协议, 还支持 FILE 和 FTP 协议.
 * 使用 jQuery 发送 AJAX 请求. jQuery 是流行的 JavaScript 库. jQuery 处理了不同浏览器的 AJAX 兼容问题, 只需要编写一套代码, 就可以在所有主流的浏览器正常运行.
 * 使用 jQuery 实现 AJAX 并不是必须的, 可以使用原生的 XMLHttpRequest, 其他 JavaScript 框架内置的 AJAX 接口, 或者使用更新的 fetch API 来发送异步请求.
@@ -492,4 +535,4 @@ def load_post():
 
 ```
 
-* HTTP 服务器端推送
+### 2.5.3 HTTP 服务器端推送
