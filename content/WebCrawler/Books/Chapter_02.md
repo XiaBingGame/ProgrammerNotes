@@ -257,14 +257,21 @@ logging.captureWarnings(True)
     - compile 保存模式
 
 ## 2.4 httpx 模块
-* 支持 HTTP 2.4 协议
+* 支持 HTTP/2.0 协议的库有 hyper 和 httpx
+* 支持 HTTP 2.0 协议
     - get
         - headers
+        - text
     - post
     - put
     - delet
     - patch
-    - Client: 设置 HTTP/1.0
+    - Client: 可设置 HTTP/2.0, 和 requests 的 Session 类似
+```
+    client = httpx.Client(http2=True)
+    response = client.get('https://spa16.scrape.center/')
+    print(response.text)
+```
     - AsyncClient: 异步请求
 * 异步设置
 ```
