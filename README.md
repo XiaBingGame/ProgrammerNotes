@@ -1,3 +1,11 @@
+<!--
+ * @Author: summericeyl summericeyl@gmail.com
+ * @Date: 2023-05-27 01:31:55
+ * @LastEditors: summericeyl summericeyl@gmail.com
+ * @LastEditTime: 2024-05-05 20:11:08
+ * @FilePath: \undefinedf:\Articles\Github\ProgrammerNotes\README.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 
 # 程序员笔记
 
@@ -36,6 +44,7 @@
 * [《代码整洁之道》读书笔记](content/《代码整洁之道》读书笔记/README.md)
 * [《这样编码才规范---128个编码好习惯》读书笔记](content/《这样编码才规范》读书笔记/README.md)
 * [《重构改善既有代码的设计》读书笔记](content/《重构改善既有代码的设计》读书笔记/README.md)
+* [《代码大全》读书笔记](content/《代码大全》读书笔记/README.md)
 
 ### 软件使用
 * [notion](content/nottion/README.md)
