@@ -1,3 +1,11 @@
+<!--
+ * @Author: summericeyl summericeyl@gmail.com
+ * @Date: 2023-05-21 01:48:45
+ * @LastEditors: summericeyl summericeyl@gmail.com
+ * @LastEditTime: 2024-09-13 07:09:16
+ * @FilePath: \ProgrammerNotes\content\ProgrammingInLua\Chapter03\README.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 * 5.3 之后的 Lua 支持两种数值, 64位的 integer 和 64 位的 float
 * 双精度浮点数最大表示 2^53 次方的整型值。
 * 支持科学计数法, 如 4.57e-3, 5E+20, 0.3e12

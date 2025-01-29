@@ -2,7 +2,7 @@
  * @Author: summericeyl summericeyl@gmail.com
  * @Date: 2024-05-05 20:11:13
  * @LastEditors: summericeyl summericeyl@gmail.com
- * @LastEditTime: 2024-05-19 22:12:04
+ * @LastEditTime: 2024-05-21 22:43:43
  * @FilePath: \undefinedf:\Articles\Github\ProgrammerNotes\content\《代码大全》读书笔记\README.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -94,3 +94,7 @@
       - 系统使用一种投票算法，算出多个结果，使用均值、中值或模数作为最终结果
       - 系统使用某个不会对系统其余部分产生危害的虚假值代替这个错误的值
       - 转入其他运转的状态，或转入某种功能降级的状态。系统可以自动关闭或重启。
+  - 架构可行性
+    - 判断是否达到性能目标, 能否在有限的资源下运转, 实现环境(运行环境)是否提供足够支持. 
+    - 架构应当论证系统的技术可行性.
+  - 过度工程

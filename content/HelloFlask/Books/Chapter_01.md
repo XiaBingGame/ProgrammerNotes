@@ -88,7 +88,7 @@ $ flask run --host=0.0.0.0
 ```
 flask run --port=8000
 ```
-* FLASK_RUN_HOST 和 FLASK_RUN_PORT 可以设置host和端口
+* FLASK_RUN_HOST 和 FLASK_RUN_PORT 可以设置 host 和端口
 * Flask 内置命令变量格式
 ```
 FLASK_<COMMAND>_<OPTION>
